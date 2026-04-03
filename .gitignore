@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Task data (user-specific, not shared)
+tasks/
+output/
+
+# Node (if any tooling is added later)
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Virtual environment
+.venv/

@@ -1,0 +1,3 @@
+[submodule "osworld-ref"]
+	path = osworld-ref
+	url = https://github.com/xlang-ai/OSWorld.git
