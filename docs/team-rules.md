@@ -49,6 +49,22 @@ Inline list validations (comma-separated values, not named ranges) CAN be verifi
 
 ---
 
+## Style Checking Rules
+
+### bgcolor Requires Full Specification
+When using `bgcolor` in style evaluators, you must define colors for ALL cells being checked — including cells that should have no fill. Always specify hex codes in the prompt (not color names or the color picker checkbox). LibreOffice checks color differently depending on how it was added.
+
+### Never Use font_color or fgcolor
+`font_color` causes the Ubuntu verifier to completely fail. `fgcolor` has extreme confusion with bgcolor in conditional formatting. Both are deprecated.
+
+### Never Use sheet_fuzzy or fuzzy_match
+These produce false positives. `sheet_fuzzy` artificially inflates RapidFuzz scores by stripping characters. `fuzzy_match` for docx is affected by hidden control characters across OSes.
+
+### Pivot Tables Pass Without Data
+The pivot_table comparator will pass even if both files have no pivot tables. Always combine with `sheet_data` to verify the pivot output values exist.
+
+---
+
 ## Data Feasibility
 
 ### Changing Data Sources
@@ -72,4 +88,7 @@ Double check that tasks are based on historical data or data that will **NOT** c
 | `delete_empty_lines: true` for docx | `/evaluator-gen`, `templates/evaluator.md` |
 | `precision: 15` for sheet_data | `/evaluator-gen`, `templates/evaluator.md` |
 | Paragraph + table dual comparators | `/evaluator-gen` |
+| bgcolor requires full hex specification | `/prompt-rewrite`, `/evaluator-gen` |
+| Never use font_color, fgcolor, sheet_fuzzy, fuzzy_match | `/evaluator-gen`, `/pre-submit` |
+| Pivot tables need sheet_data backup | `/evaluator-gen` |
 | All of the above | `/pre-submit` (verification) |

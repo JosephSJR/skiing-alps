@@ -63,16 +63,25 @@ After rewriting the prompt and getting user approval, **actually perform the tas
 
 **What to do:**
 1. Read the rewritten prompt as if you are a model seeing it for the first time
-2. Execute every instruction in the prompt hands-on:
-   - For spreadsheet tasks: use Python/pandas to create or modify the spreadsheet, applying every formula, format, filter, sort, etc.
-   - For document tasks: create/modify the document with the required content, formatting, tables
-   - For browser/Chrome tasks: use browser automation tools to navigate to the URLs, extract data, perform the required actions
-   - For multi-app tasks: execute each app's portion
+2. Execute every instruction in the prompt hands-on. **The output files must look exactly like a human built them in the real app — not like a script dumped values into a file.** That means real formulas, real structure, real styles, not hardcoded computed results.
+   - **Spreadsheet tasks (.xlsx):**
+     - Use `openpyxl` (or drive LibreOffice/Excel directly). **Never use pandas to write the final file** — pandas flattens formulas to plain values and strips styles.
+     - If the prompt says to compute something (sum, average, lookup, conditional, etc.), the cell MUST contain the actual Excel formula (e.g., `=SUM(B2:B10)`, `=VLOOKUP(...)`, `=IF(...)`) — not the pre-computed number.
+     - Preserve and author real structure: merged cells, column widths, number formats, conditional formatting, data validation (as list/custom formula per team rules), named ranges, cell styles, borders, fills.
+     - When opening an existing file to modify it, load with `openpyxl.load_workbook(path)` (default `data_only=False`) so existing formulas survive. Never round-trip through pandas.
+     - After saving, re-open the file and verify: formulas are still formulas (check `cell.value` starts with `=`), styles survived, and the file opens cleanly in LibreOffice/Excel.
+   - **Document tasks (.docx):**
+     - Use `python-docx` (or drive Word/LibreOffice Writer directly). Produce real docx structure: headings with heading styles, real tables (not tab-separated text), real bullet/numbered lists, real bold/italic runs, real page breaks, real headers/footers.
+     - Never emit a plain-text file renamed to `.docx`. Never paste a whole table as one text blob.
+     - Match the exact paragraph/table order the prompt describes, and respect any interleave language.
+   - **Browser/Chrome tasks:** use browser automation tools to navigate to the URLs, extract data, and perform the required actions. Capture screenshots and the GIF as described below.
+   - **Multi-app tasks:** execute each app's portion with the rules above.
 3. Document what happened during execution:
    - Did every step work as described?
    - Were any instructions ambiguous when you actually tried to follow them?
    - Did you have to make assumptions the prompt didn't cover?
    - Did any data lookups return unexpected results (zero rows, missing columns, etc.)?
+   - **Did the resulting file look human-authored?** Open it and check: formulas are live, styles are present, structure is real. If not, redo it before moving on.
 
 **After execution, re-evaluate the prompt:**
 - If execution revealed **no issues**: confirm the prompt is validated and proceed
@@ -85,7 +94,7 @@ After rewriting the prompt and getting user approval, **actually perform the tas
 - Prompt changes made as a result (if any)
 - Confirmation that the prompt accurately describes an achievable task
 
-**The output artifacts from this execution become the basis for the VM walkthrough and ground truth in later steps.**
+**The output artifacts from this execution become the basis for the VM walkthrough and ground truth in later steps — so they must be production-quality, human-authored-looking files, not script dumps.**
 
 **Navigation evidence (for Chrome/browser tasks):**
 During execution, create a `tasks/<date>/<task-id>/navigation_steps/` folder and:

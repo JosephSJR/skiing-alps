@@ -2,6 +2,8 @@
 
 Complete list of available comparators for evaluator JSONs.
 
+**See also:** `docs/comparator-status.md` for deprecation status, cross-platform bugs, and CB feedback. `docs/what-cannot-be-checked.md` for hard limits on what OSWorld cannot verify.
+
 ---
 
 ## compare_table (Spreadsheets)
@@ -79,23 +81,23 @@ Checks printed text representation.
 ```
 
 #### `sheet_fuzzy`
-Range-based fuzzy cell matching.
-- `rules`: array with `includes`/`exact_match`/`fuzzy_match`
-```json
-{ "type": "sheet_fuzzy", "rules": [...] }
-```
+**DEPRECATED — DO NOT USE.** Strips characters artificially, inflating RapidFuzz scores to 100% and causing false positives. See `docs/comparator-status.md`.
 
 #### `style`
-Checks cell formatting. Available `props`: `number_format`, `font_name`, `font_color`, `font_bold`, `font_italic`, `font_underline`, `font_size`, `fill_type`, `bgcolor`, `fgcolor`, `hyperlink`, `merge`.
+Checks cell formatting. Available `props`: `number_format`, `font_name`, `font_bold`, `font_italic`, `font_underline`, `font_size`, `fill_type`, `bgcolor`, `hyperlink`, `merge`.
+
+**Deprecated props — DO NOT USE:**
+- `font_color` — causes Ubuntu verifier to completely fail
+- `fgcolor` — extreme confusion/overlap with bgcolor in conditional formatting
+
+**bgcolor rules:** When checking bgcolor, define ALL cell colors (including no-fill cells) and always use hex codes in the prompt.
+
 ```json
 { "type": "style", "sheet_idx0": 0, "sheet_idx1": "EI0", "props": ["bgcolor", "font_bold"] }
 ```
 
 #### `freeze`
-Checks freeze pane settings. **NOTE: Team rules say remove freeze requirements from prompts — evaluators are faulty with this check.**
-```json
-{ "type": "freeze", "sheet_idx0": 0, "sheet_idx1": "EI0" }
-```
+**DEPRECATED — DO NOT USE.** Freeze pane check is broken cross-platform. Remove freeze requirements from prompts.
 
 #### `zoom`
 Checks sheet zoom level.
@@ -144,10 +146,12 @@ Checks data validation rules.
 See `docs/osworld-evaluator-source.md` for full attribute list and matching methods.
 
 #### `row_props` / `col_props`
-Checks row height / column width. No extra params.
+Checks row/column properties. Safe props: `hidden`, `collapsed`. 
+
+**Deprecated props — DO NOT USE:** `width`, `height` (cross-platform font metrics differ), `auto_size` (doesn't persist after save), `min`/`max` (XML representation depends on selection method).
+
 ```json
-{ "type": "row_props" }
-{ "type": "col_props" }
+{ "type": "col_props", "sheet_idx0": 0, "sheet_idx1": "EI0", "props": ["hidden"] }
 ```
 
 #### `filter`
@@ -163,10 +167,7 @@ Checks pivot table definitions. No extra params.
 ```
 
 #### `chart`
-Checks chart structure (title, legend, type, axis titles). **NOTE: Team rules say chart CREATION tasks are infeasible — skip and flag.**
-```json
-{ "type": "chart", "chart_props": [...] }
-```
+**DEPRECATED — DO NOT USE.** All chart props are deprecated due to cross-platform DPI scaling, anchor shifting, and dimension mismatches between LibreOffice and Excel. Chart creation tasks are infeasible.
 
 #### `check_cell`
 Checks specific cell value/style by coordinate.
@@ -354,21 +355,7 @@ Runs a shell command and checks its output.
 
 ## fuzzy_match
 
-Content comparison with tolerance for minor differences.
-
-```json
-{
-  "type": "fuzzy_match",
-  "path": "/Users/user/Desktop/essay.txt",
-  "ground_truth_url": "https://cds.example.com/files/ghi789",
-  "threshold": 0.90
-}
-```
-
-**Parameters**:
-- `threshold`: Minimum similarity (0.0 to 1.0)
-
-**Use when**: Content should be similar but minor formatting differences are acceptable.
+**DEPRECATED — DO NOT USE.** Fuzzy matching produces false positives from hidden control characters (zero-width spaces, soft hyphens) and artificially inflated similarity scores. Use `exact_match` or `text_contains` instead.
 
 ---
 

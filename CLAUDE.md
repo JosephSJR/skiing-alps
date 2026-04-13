@@ -73,6 +73,8 @@ You are helping a **Scale AI contractor** build high-quality Skiing Alps tasks. 
 
 ### Comparator Selection
 - See `docs/comparators.md` for the full list and correct JSON format
+- See `docs/comparator-status.md` for deprecation status, cross-platform bugs, and CB reviewer feedback
+- See `docs/what-cannot-be-checked.md` for hard limits on what OSWorld cannot verify at all
 - See `docs/osworld-evaluator-source.md` for source-level details on what OSWorld actually checks (derived from `osworld-ref/`)
 - Always consult `osworld-ref/evaluation_examples/` for real evaluator examples and `osworld-ref/` source code when unsure about evaluator format or comparator behavior
 - `compare_table`: For spreadsheet tasks — rules-based with `sheet_data`, `style`, etc.
